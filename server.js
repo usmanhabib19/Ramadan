@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -12,6 +14,12 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from the 'dist' directory (Vite build output)
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Request Logger
 app.use((req, res, next) => {
@@ -239,6 +247,11 @@ app.post('/api/community/messages', async (req, res) => {
 
 // Health Check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+// Serve the frontend for any other route (Enables React Router/client-side routing)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on http://127.0.0.1:${port}`);
