@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, MapPin, AlignLeft, Camera, Save, LogOut, CheckCircle2, Loader2 } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 const ProfileModal = ({ isOpen, onClose, userEmail, onUpdate, onLogout }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +26,7 @@ const ProfileModal = ({ isOpen, onClose, userEmail, onUpdate, onLogout }) => {
         setIsLoading(true);
         setError(null);
         try {
-            const res = await fetch(`http://127.0.0.1:5000/api/members/${userEmail}`);
+            const res = await fetch(`${API_URL}/api/members/${userEmail}`);
             if (res.ok) {
                 const data = await res.json();
                 setProfileData({
@@ -51,7 +52,7 @@ const ProfileModal = ({ isOpen, onClose, userEmail, onUpdate, onLogout }) => {
         setSuccess(false);
 
         try {
-            const res = await fetch('http://127.0.0.1:5000/api/members', {
+            const res = await fetch(`${API_URL}/api/members`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(profileData)

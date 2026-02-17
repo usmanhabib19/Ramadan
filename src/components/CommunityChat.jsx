@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Send, Users, Loader2 } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 const CommunityChat = () => {
     const [messages, setMessages] = useState([]);
@@ -31,7 +32,7 @@ const CommunityChat = () => {
 
     const fetchMessages = async () => {
         try {
-            const res = await fetch('http://127.0.0.1:5000/api/community/messages');
+            const res = await fetch(`${API_URL}/api/community/messages`);
             const data = await res.json();
             if (Array.isArray(data)) setMessages(data);
         } catch (err) {
@@ -45,7 +46,7 @@ const CommunityChat = () => {
 
         setIsLoading(true);
         try {
-            await fetch('http://127.0.0.1:5000/api/community/messages', {
+            await fetch(`${API_URL}/api/community/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, text: newMessage }),

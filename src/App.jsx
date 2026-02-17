@@ -9,6 +9,7 @@ import JoinCommunityModal from './components/JoinCommunityModal';
 import CommunityChat from './components/CommunityChat';
 import ProfileModal from './components/ProfileModal';
 import { useState, useEffect } from 'react';
+import API_URL from './apiConfig';
 
 function App() {
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
@@ -48,7 +49,7 @@ function App() {
 
   const fetchMemberCount = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/members/count');
+      const res = await fetch(`${API_URL}/api/members/count`);
       const data = await res.json();
       if (data.count !== undefined) setMemberCount(data.count);
     } catch (err) {

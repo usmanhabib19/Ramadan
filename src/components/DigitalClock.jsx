@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 const DigitalClock = () => {
     const [time, setTime] = useState(new Date());
@@ -10,7 +11,7 @@ const DigitalClock = () => {
         const syncTime = async () => {
             try {
                 const start = Date.now();
-                const res = await fetch('http://127.0.0.1:5000/api/time');
+                const res = await fetch(`${API_URL}/api/time`);
                 const data = await res.json();
                 const end = Date.now();
                 const latency = (end - start) / 2;

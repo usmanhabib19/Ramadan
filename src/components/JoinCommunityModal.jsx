@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, User, ShieldCheck, CheckCircle2, Loader2 } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 const JoinCommunityModal = ({ isOpen, onClose, onSuccess }) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -20,7 +21,7 @@ const JoinCommunityModal = ({ isOpen, onClose, onSuccess }) => {
         const endpoint = mode === 'join' ? '/api/members' : '/api/members/login';
 
         try {
-            const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+            const response = await fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

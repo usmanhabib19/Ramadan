@@ -65,9 +65,14 @@ const messageSchema = new mongoose.Schema({
 const Message = mongoose.model('Message', messageSchema);
 
 // OpenAI Configuration
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+let openai = null;
+if (process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    });
+} else {
+    console.warn('WARNING: OPENAI_API_KEY is missing. AI chat features will be disabled.');
+}
 
 // Routes
 app.post('/api/chat', async (req, res) => {
@@ -76,6 +81,10 @@ app.post('/api/chat', async (req, res) => {
 
         if (!question) {
             return res.status(400).json({ error: 'Question is required' });
+        }
+
+        if (!openai) {
+            return res.status(503).json({ error: 'AI features are currently unavailable. Please configure the OpenAI API key.' });
         }
 
         // Call OpenAI
