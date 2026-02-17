@@ -17,6 +17,25 @@ function App() {
   const [memberCount, setMemberCount] = useState(0);
   const [isJoined, setIsJoined] = useState(() => localStorage.getItem('community-joined') === 'true');
   const [userEmail, setUserEmail] = useState(() => localStorage.getItem('user-email') || '');
+  const [liveCount, setLiveCount] = useState(1);
+
+  const fetchOnlineCount = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/online/count`);
+      const data = await res.json();
+      if (data.count !== undefined) setLiveCount(data.count);
+    } catch (err) {
+      console.error('Failed to fetch online count');
+    }
+  };
+
+  const sendHeartbeat = async () => {
+    try {
+      await fetch(`${API_URL}/api/online/heartbeat`, { method: 'POST' });
+    } catch (err) {
+      console.error('Heartbeat failed');
+    }
+  };
 
   const handleJoinSuccess = (email) => {
     fetchMemberCount();
@@ -59,6 +78,16 @@ function App() {
 
   useEffect(() => {
     fetchMemberCount();
+    fetchOnlineCount();
+    sendHeartbeat();
+
+    const countInterval = setInterval(fetchOnlineCount, 60000); // Update count every minute
+    const heartbeatInterval = setInterval(sendHeartbeat, 30000); // Heartbeat every 30s
+
+    return () => {
+      clearInterval(countInterval);
+      clearInterval(heartbeatInterval);
+    };
   }, []);
 
   const features = [
@@ -74,7 +103,7 @@ function App() {
         onOpenProfile={() => setIsProfileModalOpen(true)}
         isJoined={isJoined}
       />
-      <Hero memberCount={memberCount} isJoined={isJoined} />
+      <Hero memberCount={memberCount} liveCount={liveCount} isJoined={isJoined} />
 
       {/* Features Section */}
       <section id="community" className="py-24 bg-[#0a1324]/50 islamic-pattern relative overflow-hidden">

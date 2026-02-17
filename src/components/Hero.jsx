@@ -4,7 +4,7 @@ import { Lantern, Ornament } from './Decorations';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import DigitalClock from './DigitalClock';
 
-const Hero = ({ memberCount, isJoined }) => {
+const Hero = ({ memberCount, liveCount, isJoined }) => {
     const { data } = usePrayerTimes('Pakistan', 'PK');
     const hijriYear = data?.date?.hijri?.year || '1447';
     return (
@@ -46,10 +46,10 @@ const Hero = ({ memberCount, isJoined }) => {
                     <div className="flex flex-col items-start leading-tight">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                            <span className="text-[10px] font-bold tracking-widest uppercase text-[#d4af37]">Live Community</span>
+                            <span className="text-[10px] font-bold tracking-widest uppercase text-[#d4af37]">Live Online</span>
                         </div>
                         <span className="text-sm font-bold text-white">
-                            <span className="text-[#d4af37] text-lg">{memberCount.toLocaleString()}</span> Faithful Souls Joined
+                            <span className="text-[#d4af37] text-lg">{(liveCount || 1).toLocaleString()}</span> Faithful Souls Online Now
                         </span>
                     </div>
                 </motion.div>

@@ -80,6 +80,14 @@ const messageSchema = new mongoose.Schema({
 
 const Message = mongoose.model('Message', messageSchema);
 
+// Active Session Schema for Live Online Count
+const sessionSchema = new mongoose.Schema({
+    identifier: { type: String, unique: true }, // IP or Session ID
+    lastActive: { type: Date, default: Date.now }
+});
+
+const ActiveSession = mongoose.model('ActiveSession', sessionSchema);
+
 // OpenAI Configuration
 let openai = null;
 if (process.env.OPENAI_API_KEY) {
@@ -250,6 +258,34 @@ app.post('/api/community/messages', async (req, res) => {
         res.status(201).json(newMessage);
     } catch (error) {
         res.status(500).json({ error: 'Failed to send message' });
+    }
+});
+
+// Online Status Endpoints
+app.post('/api/online/heartbeat', async (req, res) => {
+    try {
+        const identifier = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        await ActiveSession.findOneAndUpdate(
+            { identifier },
+            { lastActive: new Date() },
+            { upsert: true, new: true }
+        );
+        res.status(200).json({ status: 'ok' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update heartbeat' });
+    }
+});
+
+app.get('/api/online/count', async (req, res) => {
+    try {
+        // Cleanup old sessions (older than 2 minutes)
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        await ActiveSession.deleteMany({ lastActive: { $lt: twoMinutesAgo } });
+
+        const count = await ActiveSession.countDocuments();
+        res.json({ count: Math.max(1, count) }); // Always show at least 1 (the current user)
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch online count' });
     }
 });
 

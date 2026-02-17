@@ -6,7 +6,7 @@ import { useCurrentPrayer } from '../hooks/useCurrentPrayer';
 
 const PrayerTimes = () => {
     const { data, loading, error } = usePrayerTimes('Pakistan', 'PK');
-    const nextPrayer = useCurrentPrayer(data?.timings);
+    const { currentPrayer, countdown, currentTime } = useCurrentPrayer(data?.timings);
 
     if (loading) return (
         <section id="prayer-times" className="py-24 relative overflow-hidden islamic-pattern flex justify-center items-center min-h-[400px]">
@@ -30,33 +30,50 @@ const PrayerTimes = () => {
     };
 
     const prayers = [
-        { name: 'Fajr', time: formatTo12Hour(timings.Fajr), icon: <Sunrise className="w-5 h-5 text-amber-200" />, active: nextPrayer === 'Fajr' },
-        { name: 'Dhuhr', time: formatTo12Hour(timings.Dhuhr), icon: <Sun className="w-5 h-5 text-amber-300" />, active: nextPrayer === 'Dhuhr' },
-        { name: 'Asr', time: formatTo12Hour(timings.Asr), icon: <Sun className="w-5 h-5 text-amber-400" />, active: nextPrayer === 'Asr' },
-        { name: 'Maghrib', time: formatTo12Hour(timings.Maghrib), icon: <Sunset className="w-5 h-5 text-orange-400" />, active: nextPrayer === 'Maghrib' },
-        { name: 'Isha', time: formatTo12Hour(timings.Isha), icon: <Moon className="w-5 h-5 text-blue-300" />, active: nextPrayer === 'Isha' },
+        { name: 'Fajr', time: formatTo12Hour(timings.Fajr), icon: <Sunrise className="w-5 h-5 text-amber-200" />, active: currentPrayer === 'Fajr' },
+        { name: 'Dhuhr', time: formatTo12Hour(timings.Dhuhr), icon: <Sun className="w-5 h-5 text-amber-300" />, active: currentPrayer === 'Dhuhr' },
+        { name: 'Asr', time: formatTo12Hour(timings.Asr), icon: <Sun className="w-5 h-5 text-amber-400" />, active: currentPrayer === 'Asr' },
+        { name: 'Maghrib', time: formatTo12Hour(timings.Maghrib), icon: <Sunset className="w-5 h-5 text-orange-400" />, active: currentPrayer === 'Maghrib' },
+        { name: 'Isha', time: formatTo12Hour(timings.Isha), icon: <Moon className="w-5 h-5 text-blue-300" />, active: currentPrayer === 'Isha' },
     ];
 
     return (
         <section id="prayer-times" className="py-24 relative overflow-hidden islamic-pattern">
             <Ornament className="absolute -top-40 -right-40 opacity-5" />
             <div className="container px-6 relative z-10">
-                <div className="text-center mb-16">
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        className="text-4xl md:text-5xl font-bold mb-4"
+                <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+                    <div className="text-center md:text-left">
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            className="text-4xl md:text-5xl font-bold mb-4"
+                        >
+                            Daily <span className="text-[#d4af37]">Prayer Times</span>
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="text-slate-400"
+                        >
+                            Stay connected with your spiritual schedule in Pakistan
+                        </motion.p>
+                    </div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        className="glass-card p-6 flex flex-col items-center md:items-end gap-3 min-w-[280px] border-[#d4af37]/30"
                     >
-                        Daily <span className="text-[#d4af37]">Prayer Times</span>
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-slate-400"
-                    >
-                        Stay connected with your spiritual schedule in Pakistan
-                    </motion.p>
+                        <div className="flex items-center gap-3 text-[#d4af37]">
+                            <Clock className="w-5 h-5" />
+                            <span className="text-2xl font-mono font-bold tracking-wider">{currentTime}</span>
+                        </div>
+                        <div className="flex flex-col items-center md:items-end">
+                            <span className="text-xs text-slate-400 uppercase tracking-widest mb-1">Next: {currentPrayer} in</span>
+                            <span className="text-3xl font-mono font-bold text-white tracking-tighter">{countdown}</span>
+                        </div>
+                    </motion.div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
