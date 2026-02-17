@@ -5,27 +5,35 @@ import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from the 'dist' directory (Vite build output)
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Request Logger
+// Request Logger (Move to top to see all requests)
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
     next();
 });
+
+// Essential Middleware
+app.use(cors());
+app.use(express.json());
+
+// Serve static files from the 'dist' directory (Vite build output)
+const distPath = path.join(__dirname, 'dist');
+console.log('Static files path:', distPath);
+if (fs.existsSync(distPath)) {
+    console.log('✅ Dist folder found!');
+    app.use(express.static(distPath));
+} else {
+    console.warn('⚠️ Dist folder NOT found! Did you run "npm run build"?');
+}
 
 // MongoDB Connection with Retry Logic
 const connectWithRetry = () => {
@@ -250,7 +258,18 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 // Serve the frontend for any other route (Enables React Router/client-side routing)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    try {
+        const indexPath = path.join(__dirname, 'dist', 'index.html');
+        if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+        } else {
+            console.error('index.html not found at:', indexPath);
+            res.status(404).send('Frontend build not found. Please ensure "npm run build" completed successfully.');
+        }
+    } catch (error) {
+        console.error('Error serving index.html:', error);
+        res.status(500).send('Internal Server Error while serving frontend');
+    }
 });
 
 const server = app.listen(port, '0.0.0.0', () => {
