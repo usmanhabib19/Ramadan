@@ -257,7 +257,7 @@ app.post('/api/community/messages', async (req, res) => {
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 // Serve the frontend for any other route (Enables React Router/client-side routing)
-app.get('*', (req, res) => {
+app.get('(.*)', (req, res) => {
     try {
         const indexPath = path.join(__dirname, 'dist', 'index.html');
         if (fs.existsSync(indexPath)) {
